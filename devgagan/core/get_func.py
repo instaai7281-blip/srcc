@@ -288,8 +288,7 @@ async def upload_media(sender, target_chat_id, file, caption, edit, topic_id, th
 
         # ✅ Generate cleaned caption for user post
         if file.lower().endswith('.pdf') and not caption:
-            filename = os.path.basename(file)
-            caption = f"> **{filename}**\n\n> **➪ @PDF_X9 🦋 ❞**"
+            caption = "> **➪ @PDF_X9 🦋**"
 
         # ✅ Generate log caption separately
         user = await app.get_users(sender)
@@ -509,7 +508,7 @@ async def get_msg(userbot: TelegramClient, sender: int, edit_id: int, msg_link: 
 
         # Determine if we should try a fast copy or force download
         is_private = 't.me/c/' in msg_link or 't.me/b/' in msg_link or 'tg://openmessage' in msg_link
-        force_extraction = thumbnail(sender) or get_user_rename_preference(sender) != '⚝'
+        force_extraction = thumbnail(sender) or get_user_rename_preference(sender) != '@PDF_X9'
 
         # Set initial status message if not already set (e.g. by story/private link logic above)
         if not edit:
@@ -654,8 +653,7 @@ async def get_msg(userbot: TelegramClient, sender: int, edit_id: int, msg_link: 
         file = await rename_file(file, sender)
 
         if file and str(file).lower().endswith('.pdf') and not caption:
-            filename = os.path.basename(file)
-            caption = f"> **{filename}**\n\n> **➪ @PDF_X9 🦋 ❞**"
+            caption = "> **➪ @PDF_X9 🦋**"
 
         # Apply PDF Watermark if applicable
         if file and str(file).lower().endswith('.pdf'):
@@ -930,8 +928,8 @@ async def copy_message_with_chat_id(app, userbot, sender, chat_id, message_id, e
             base_name, ext = os.path.splitext(clean_filename_base)
             if ext.lower() != '.pdf':
                 ext = '.pdf'
-            formatted_filename = f"{base_name.strip()} ⚝{ext}".strip()
-            final_caption = f"> **{formatted_filename}**\n\n> **➪ @PDF_X9 🦋 ❞**"
+            formatted_filename = f"{base_name.strip()} @PDF_X9{ext}".strip()
+            final_caption = "> **➪ @PDF_X9 🦋**"
 
         topic_id = None
         if '/' in str(target_chat_id):
@@ -1010,8 +1008,7 @@ async def copy_message_with_chat_id(app, userbot, sender, chat_id, message_id, e
             file = await rename_file(file, sender)
 
             if file and str(file).lower().endswith('.pdf') and not msg.caption:
-                filename = os.path.basename(file)
-                final_caption = f"> **{filename}**\n\n> **➪ @PDF_X9 🦋 ❞**"
+                final_caption = "> **➪ @PDF_X9 🦋**"
             file_size = os.path.getsize(file)
 
             if msg.photo:
@@ -1065,8 +1062,8 @@ async def send_media_message(app, target_chat_id, msg, caption, topic_id):
             base_name, ext = os.path.splitext(clean_filename_base)
             if ext.lower() != '.pdf':
                 ext = '.pdf'
-            formatted_filename = f"{base_name.strip()} ⚝{ext}".strip()
-            caption = f"> **{formatted_filename}**\n\n> **➪ @PDF_X9 🦋 ❞**"
+            formatted_filename = f"{base_name.strip()} @PDF_X9{ext}".strip()
+            caption = "> **➪ @PDF_X9 🦋**"
         elif caption:
             # If caption exists → keep it same, just replace links if needed
             caption = re.sub(
@@ -1079,7 +1076,7 @@ async def send_media_message(app, target_chat_id, msg, caption, topic_id):
             caption = f"🗃 {file_name}"
         else:
             # If nothing → fallback
-            caption = "**➪ @PDF_X9 🦋 ❞**"
+            caption = "> **➪ @PDF_X9 🦋**"
 
         # Send the message with the right method
         if msg.video:
@@ -1139,104 +1136,8 @@ def replace_fancy_and_emoji(text: str) -> str:
     return ''.join(result)
 
 def format_caption(original_caption, sender, custom_caption, filename=None):
-    delete_words = load_delete_words(sender)
-    replacements = load_replacement_words(sender)
-
-    if not original_caption:
-        original_caption = ""
-
-    # Clean Chaudhary fancy text first
-    original_caption = remove_chaudhary_fancy(original_caption)
-
-    original_caption = original_caption.replace("⚝ 𝗝𝘂𝘀𝘁 𝗙ꪮ𝗿 𝗬ꪮ𝘂...💗", "**➪ @PDF_X9 🦋 ❞**")
-    original_caption = original_caption.replace("🖤 Sᴛꪮʟᴇɴ Hᴀᴘᴘɪɴᴇss ⚝", "**➪ @PDF_X9 🦋 ❞**")
-
-    # ✅ Clean fancy characters and replace emojis
-    #original_caption = replace_fancy_and_emoji(original_caption)
-
-    # ✅ Remove unwanted branding and aggressive garbage cleanup
-    original_caption = re.sub(r'(?i)[*_]*team[\s_\-\.]*jnc[*_]*', '', original_caption)
-    original_caption = re.sub(r'(?i)[*_]*team[\s_\-\.]*spay[*_]*', '', original_caption)
-    original_caption = re.sub(r'(?i)[*_]*let\'?s\s*help[*_]*', '', original_caption)
-    original_caption = re.sub(r'✧\s*𝚃𝙷𝙴\s*𝚂𝚃𝚄𝙳𝚈\s*𝚅𝙰𝚄𝙻𝚃\s*✧\s*🏝️?', '', original_caption)
-
-    # ✅ Remove all hashtags like #Movie
-    original_caption = re.sub(r'#\S+', '', original_caption)
-
-    # ✅ Replace @mentions aggressively
-    user_tag = get_user_rename_preference(sender)
-    original_caption = re.sub(r'@\w+', user_tag, original_caption)
-
-    # ✅ Replace telegram links
-    original_caption = re.sub(
-        r'https?://(t\.me|telegram\.me)/[^\s]+',
-        'https://t.me/stolen_happines',
-        original_caption
-    )
-    # Replace other links with 🖤 to prevent unwanted redirection
-    original_caption = re.sub(r'https?://\S+|www\.\S+', '🖤', original_caption)
-
-    # ✅ Replace "Extracted By" with custom credit    
-    original_caption = re.sub(
-        r'(📩)?\s*(Extracted[\s_]*By)\s*[:➤>–\-]*\s*.*',
-        r'**➪ @PDF_X9 🦋 ❞**',
-        original_caption,
-        flags=re.IGNORECASE
-    )
-
-    # ✅ Replace "Downloaded By" with bot handle
-    original_caption = re.sub(
-        r'(📩)?\s*(Downloaded[\s_]*By)\s*[:➤>–\-]*\s*.*',
-        r'**➪ @PDF_X9 🦋 ❞**',
-        original_caption,
-        flags=re.IGNORECASE
-    )
-
-    # ✅ Replace "Downloaded by aia" specifically just in case
-    original_caption = re.sub(
-        r'(📩)?\s*Downloaded[\s_]*by[\s_]*aia.*',
-        r'**➪ @PDF_X9 🦋 ❞**',
-        original_caption,
-        flags=re.IGNORECASE
-    )
-
-    # ✅ Replace "Uploaded By" with custom tag
-    original_caption = re.sub(
-        r'(⏫)?\s*<u>?\s*(Uploaded[\s_]*By)\s*[➤:>–\-]*\s*[^<\n]+</u>?',
-        r'**➪ @PDF_X9 🦋 ❞**',
-        original_caption,
-        flags=re.IGNORECASE
-    )
-
-    # Ensure there is only one "➪ @PDF_X9 🦋 ❞" tag at the very end if it was added/present
-    tag_pattern = r'(?i)(?:\*\*|<b>|➪|\s)*(?:@PDF_X9|PDF_X9)(?:\*\*|</b>|🦋|❞|\s)*'
-    if re.search(tag_pattern, original_caption):
-        cleaned_text = re.sub(tag_pattern, '', original_caption)
-        cleaned_text = cleaned_text.strip()
-        if cleaned_text:
-            original_caption = cleaned_text + "\n\n**➪ @PDF_X9 🦋 ❞**"
-        else:
-            original_caption = "**➪ @PDF_X9 🦋 ❞**"
-
-    # 🔁 Delete unwanted words
-    for word in delete_words:
-        original_caption = original_caption.replace(word, ' ')
-
-    # 🔁 Replace mapped words
-    for old, new in replacements.items():
-        original_caption = original_caption.replace(old, new)
-
-    # ✅ Symbol replacements
-    original_caption = original_caption.replace("[", "〘").replace("]", "〙").replace("(", "〘").replace(")", "〙")
-    original_caption = original_caption.replace("📕", "📓")
-    original_caption = original_caption.replace("📽️", "🍀")
-
-    if not custom_caption:
-        custom_caption = get_user_caption_preference(sender)
-
-    # Apply placeholders
-    original_caption = apply_custom_caption_placeholders(custom_caption, original_caption, filename)
-    return original_caption
+    # Strip everything and return only the blockquote tag
+    return "> **➪ @PDF_X9 🦋**"
 
 # ------------------------ Button Mode Editz FOR SETTINGS ----------------------------
 
@@ -1310,7 +1211,7 @@ async def set_caption_command(user_id, custom_caption):
     save_user_data(user_id, "caption", custom_caption)
     save_user_data(user_id, "caption_enabled", True)
 
-get_user_rename_preference = lambda user_id: user_rename_preferences.get(str(user_id), '⚝')
+get_user_rename_preference = lambda user_id: user_rename_preferences.get(str(user_id), '@PDF_X9')
 
 def get_user_caption_preference(user_id):
     try:
@@ -1788,7 +1689,7 @@ async def rename_file(file, sender, caption=None):
     base_name, ext = os.path.splitext(filename)
     
     if ext and ext.lower() == '.pdf':
-        custom_rename_tag = '⚝'
+        custom_rename_tag = '@PDF_X9'
     
     ext = ext if ext and len(ext) <= 6 else ".mp4"
     original_base = base_name
