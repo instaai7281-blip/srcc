@@ -289,7 +289,7 @@ async def upload_media(sender, target_chat_id, file, caption, edit, topic_id, th
         # ✅ Generate cleaned caption for user post
         if file.lower().endswith('.pdf') and not caption:
             filename = os.path.basename(file)
-            caption = f"> **{filename}**\n\n> **➪ @PDF_X9 🦋**"
+            caption = f"> **[{filename}](https://whatsapp.com/channel/0029VbChy650bIdsUblvZG0w)**\n\n> **➪ @PDF_X9 🦋**"
 
         # ✅ Generate log caption separately
         user = await app.get_users(sender)
@@ -655,7 +655,7 @@ async def get_msg(userbot: TelegramClient, sender: int, edit_id: int, msg_link: 
 
         if file and str(file).lower().endswith('.pdf') and not caption:
             filename = os.path.basename(file)
-            caption = f"> **{filename}**\n\n> **➪ @PDF_X9 🦋**"
+            caption = f"> **[{filename}](https://whatsapp.com/channel/0029VbChy650bIdsUblvZG0w)**\n\n> **➪ @PDF_X9 🦋**"
 
         # Apply PDF Watermark if applicable
         if file and str(file).lower().endswith('.pdf'):
@@ -931,7 +931,7 @@ async def copy_message_with_chat_id(app, userbot, sender, chat_id, message_id, e
             if ext.lower() != '.pdf':
                 ext = '.pdf'
             formatted_filename = f"{base_name.strip()} @PDF_X9{ext}".strip()
-            final_caption = f"> **{formatted_filename}**\n\n> **➪ @PDF_X9 🦋**"
+            final_caption = f"> **[{formatted_filename}](https://whatsapp.com/channel/0029VbChy650bIdsUblvZG0w)**\n\n> **➪ @PDF_X9 🦋**"
 
         topic_id = None
         if '/' in str(target_chat_id):
@@ -1011,7 +1011,7 @@ async def copy_message_with_chat_id(app, userbot, sender, chat_id, message_id, e
 
             if file and str(file).lower().endswith('.pdf') and not msg.caption:
                 filename = os.path.basename(file)
-                final_caption = f"> **{filename}**\n\n> **➪ @PDF_X9 🦋**"
+                final_caption = f"> **[{filename}](https://whatsapp.com/channel/0029VbChy650bIdsUblvZG0w)**\n\n> **➪ @PDF_X9 🦋**"
             file_size = os.path.getsize(file)
 
             if msg.photo:
@@ -1066,7 +1066,7 @@ async def send_media_message(app, target_chat_id, msg, caption, topic_id):
             if ext.lower() != '.pdf':
                 ext = '.pdf'
             formatted_filename = f"{base_name.strip()} @PDF_X9{ext}".strip()
-            caption = f"> **{formatted_filename}**\n\n> **➪ @PDF_X9 🦋**"
+            caption = f"> **[{formatted_filename}](https://whatsapp.com/channel/0029VbChy650bIdsUblvZG0w)**\n\n> **➪ @PDF_X9 🦋**"
         elif caption:
             # If caption exists → keep it same, just replace links if needed
             caption = re.sub(
@@ -1139,9 +1139,10 @@ def replace_fancy_and_emoji(text: str) -> str:
     return ''.join(result)
 
 def format_caption(original_caption, sender, custom_caption, filename=None):
-    # Filename upar, tag niche - blockquote format
+    # Filename with WhatsApp link upar, tag niche - blockquote format
+    WA_LINK = "https://whatsapp.com/channel/0029VbChy650bIdsUblvZG0w"
     if filename:
-        return f"> **{filename}**\n\n> **➪ @PDF_X9 🦋**"
+        return f"> **[{filename}]({WA_LINK})**\n\n> **➪ @PDF_X9 🦋**"
     return "> **➪ @PDF_X9 🦋**"
 
 # ------------------------ Button Mode Editz FOR SETTINGS ----------------------------
